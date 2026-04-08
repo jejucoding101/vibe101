@@ -8,14 +8,13 @@
 
 ### GUI vs CLI
 
+![GUI vs CLI 비교](images/gui_vs_cli.png)
+
 여러분은 보통 마우스로 폴더를 더블클릭하여 파일을 열죠? 이것이 **GUI**(Graphical User Interface)입니다.
 
 **CLI**(Command Line Interface)는 텍스트로 같은 일을 합니다:
-
-```
-GUI: 내 문서 폴더를 더블클릭 → 파일 보기
-CLI: cd Documents → dir (또는 ls)
-```
+- **GUI**: 내 문서 폴더를 더블클릭 → 파일 보기
+- **CLI**: `cd Documents` → `dir` (또는 `ls`)
 
 #### 왜 CLI를 알아야 하나?
 
@@ -38,16 +37,13 @@ CLI: cd Documents → dir (또는 ls)
 
 ### 경로(Path)란?
 
+![파일시스템 트리와 경로 개념](images/filesystem_tree.png)
+
 파일의 **주소**입니다. 집 주소처럼 정확한 위치를 알려줍니다.
 
-```
-절대 경로: C:\Users\홍길동\Documents\report.txt   (집에서부터 전체 주소)
-상대 경로: ./Documents/report.txt                   (지금 위치 기준)
-```
-
-- `.` = 현재 폴더
-- `..` = 한 단계 위 폴더
-- `/` 또는 `\` = 폴더 구분자
+- **절대 경로**: `C:\Users\홍길동\Documents\report.txt` — 루트부터 전체 주소
+- **상대 경로**: `./Documents/report.txt` — 지금 위치 기준
+- `.` = 현재 폴더 / `..` = 한 단계 위 폴더 / `/` 또는 `\` = 폴더 구분자
 
 ---
 
