@@ -8,7 +8,9 @@
 
 ### GUI vs CLI
 
-![GUI vs CLI 비교](images/gui_vs_cli.png)
+![GUI vs CLI 비교 (1)](images/gui_vs_cli_1.png)
+
+![GUI vs CLI 비교 (2)](images/gui_vs_cli_2.png)
 
 여러분은 보통 마우스로 폴더를 더블클릭하여 파일을 열죠? 이것이 **GUI**(Graphical User Interface)입니다.
 
@@ -37,7 +39,9 @@
 
 ### 경로(Path)란?
 
-![파일시스템 트리와 경로 개념](images/filesystem_tree.png)
+![파일시스템 트리와 경로 개념 (1)](images/filesystem_tree_1.png)
+
+![파일시스템 트리와 경로 개념 (2)](images/filesystem_tree_2.png)
 
 파일의 **주소**입니다. 집 주소처럼 정확한 위치를 알려줍니다.
 
