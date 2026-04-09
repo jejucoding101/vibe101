@@ -15,7 +15,9 @@
 
 ### 에러의 3가지 종류
 
-![프로그래밍 에러의 3가지 종류](images/error_types_anatomy.png)
+![프로그래밍 에러의 3가지 종류 (1)](images/error_types_anatomy_1.png)
+
+![프로그래밍 에러의 3가지 종류 (2)](images/error_types_anatomy_2.png)
 
 | 종류 | 언제 발생 | 발견 주체 | 예시 |
 |------|----------|----------|------|
@@ -55,7 +57,9 @@
 
 ### 에러 메시지 읽는 법 & AI 디버깅 워크플로우
 
-![에러 메시지 해부 및 AI 디버깅 워크플로우](images/error_debugging_flow.png)
+![에러 메시지 해부 및 AI 디버깅 워크플로우 (1)](images/error_debugging_flow_1.png)
+
+![에러 메시지 해부 및 AI 디버깅 워크플로우 (2)](images/error_debugging_flow_2.png)
 
 에러 메시지에는 항상 **3가지 핵심 정보**가 담겨 있습니다:
 
