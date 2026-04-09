@@ -10,7 +10,9 @@
 
 **J**ava**S**cript **O**bject **N**otation — 데이터를 주고받는 **세계 표준** 형식입니다.
 
-![JSON 구조 해부 — 코드와 트리로 보기](images/json_structure.png)
+![JSON 구조 해부 — 코드와 트리로 보기 (1)](images/json_structure_1.png)
+
+![JSON 구조 해부 — 코드와 트리로 보기 (2)](images/json_structure_2.png)
 
 ```json
 {
@@ -35,7 +37,7 @@
 
 ### CSV vs JSON
 
-![CSV vs JSON — 같은 데이터, 다른 표현 방식](images/csv_vs_json.png)
+![CSV vs JSON — 같은 데이터, 다른 표현 방식](images/csv_vs_json_1.png)
 
 | | CSV | JSON |
 |---|-----|------|
