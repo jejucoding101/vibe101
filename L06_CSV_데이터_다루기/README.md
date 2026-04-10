@@ -21,6 +21,8 @@
 - 각 줄: **행**(하나의 데이터 레코드)
 - 쉼표(`,`): **열 구분자**
 
+![CSV 구조 해부 — 헤더, 행, 열, 구분자 (1)](images/csv_structure_1.png)
+
 ### CSV가 쓰이는 곳
 
 - 엑셀에서 "다른 이름으로 저장" → CSV 형식
@@ -46,6 +48,8 @@ with open('data.csv', 'r', encoding='utf-8') as f:
     for row in reader:
         print(row['이름'], row['나이'])
 ```
+
+![CSV 데이터 처리 — Python vs JavaScript 비교 (2)](images/csv_structure_2.png)
 
 > 💡 CSV 처리는 **Python이 더 편합니다** — 내장 csv 모듈이 강력해요.
 

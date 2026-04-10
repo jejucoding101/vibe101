@@ -22,6 +22,10 @@
 | **필수 스킬** | 문법 암기, 디버깅 | 명확한 요구사항 정리, 결과 검증 |
 | **진입 장벽** | 높음 (수개월~수년) | 낮음 (오늘부터 가능) |
 
+![바이브코딩 — 전통 코딩 vs AI 코딩 (1)](images/vibe_coding_intro_1.png)
+
+![바이브코딩 — Antigravity 소개와 두 언어 (2)](images/vibe_coding_intro_2.png)
+
 #### Antigravity란?
 
 Google DeepMind가 만든 **AI 코딩 에이전트**입니다.
