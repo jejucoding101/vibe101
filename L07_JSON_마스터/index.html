@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7강: JSON 마스터 — 데이터의 표준 언어</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0b14; --surface: #13132a; --surface2: #1c1c3a; --surface3: #252550;
+  --border: #2a2a55; --border-light: #35356a;
+  --text: #e4e4f0; --text-dim: #9999bb; --text-muted: #666688;
+  --blue: #5b8dee; --purple: #a855f7; --green: #34d399; --orange: #f59e0b;
+  --pink: #ec4899; --cyan: #22d3ee; --red: #f87171;
+  --key: #7dd3fc; --str: #86efac; --num: #fbbf24; --bool: #f472b6; --bracket: #c084fc;
+  --radius: 14px; --radius-sm: 8px;
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased; }
+.page { max-width:880px; margin:0 auto; padding:48px 24px 80px; }
+
+/* HERO */
+.hero { text-align:center; padding:56px 24px 48px; border-bottom:1px solid var(--border); margin-bottom:48px; }
+.hero-badge { display:inline-flex; align-items:center; gap:6px; background:var(--surface2); border:1px solid var(--border); padding:6px 16px; border-radius:40px; font-size:.78rem; font-weight:600; color:var(--text-dim); margin-bottom:20px; }
+.hero h1 { font-size:2.4rem; font-weight:900; line-height:1.2; margin-bottom:12px; background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.hero p { font-size:1.05rem; color:var(--text-dim); max-width:520px; margin:0 auto; }
+
+/* SECTIONS */
+.section { margin-bottom:56px; }
+.section-header { display:flex; align-items:center; gap:14px; margin-bottom:28px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+.section-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+.section-header h2 { font-size:1.5rem; font-weight:800; }
+.section-header .time-tag { margin-left:auto; font-size:.75rem; font-weight:600; padding:4px 12px; border-radius:20px; background:var(--surface2); border:1px solid var(--border); color:var(--text-dim); white-space:nowrap; }
+
+/* CARD */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:20px; overflow:hidden; }
+.card-head { padding:14px 22px; border-bottom:1px solid var(--border); font-weight:700; font-size:.95rem; display:flex; align-items:center; gap:10px; }
+.card-body { padding:22px; }
+
+/* CODE */
+.code-block { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin:16px 0; }
+.code-bar { display:flex; align-items:center; gap:8px; padding:10px 18px; background:var(--surface2); border-bottom:1px solid var(--border); font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); }
+.code-bar .dot { width:8px; height:8px; border-radius:50%; }
+pre.code { padding:20px; font-family:'JetBrains Mono',monospace; font-size:.82rem; line-height:1.75; overflow-x:auto; white-space:pre; }
+.k { color:var(--key); } .s { color:var(--str); } .n { color:var(--num); } .b { color:var(--bool); }
+.br { color:var(--bracket); font-weight:600; } .p { color:var(--text-muted); } .cmt { color:var(--text-muted); font-style:italic; }
+
+/* SPLIT */
+.split { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:20px 0; }
+@media (max-width:700px) { .split { grid-template-columns:1fr; } }
+
+/* TREE */
+.tree-item { display:flex; align-items:flex-start; gap:12px; padding:10px 0; }
+.tree-item + .tree-item { border-top:1px solid var(--border); }
+.tree-dot { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:800; flex-shrink:0; margin-top:2px; color:#fff; }
+.tree-label { font-weight:700; font-size:.88rem; }
+.tree-value { font-family:'JetBrains Mono',monospace; font-size:.8rem; color:var(--text-dim); margin-top:2px; }
+.tree-sub { margin-left:44px; border-left:2px solid var(--border); padding-left:14px; margin-top:4px; }
+.tree-sub-item { padding:3px 0; font-family:'JetBrains Mono',monospace; font-size:.8rem; color:var(--text-dim); }
+
+/* CHIPS */
+.chips { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; margin:20px 0; }
+.chip { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 12px; text-align:center; transition:transform .15s,border-color .15s; }
+.chip:hover { transform:translateY(-3px); border-color:var(--blue); }
+.chip-icon { font-size:1.5rem; margin-bottom:4px; }
+.chip-name { font-weight:700; font-size:.85rem; }
+.chip-eg { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--text-dim); margin-top:3px; }
+
+/* STEPS */
+.steps { display:flex; flex-direction:column; gap:10px; margin:16px 0; }
+.step { display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 20px; transition:border-color .15s; }
+.step:hover { border-color:var(--green); }
+.step-n { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.82rem; background:linear-gradient(135deg,var(--blue),var(--purple)); flex-shrink:0; color:#fff; }
+.step-text { font-size:.9rem; }
+.step-text code { font-family:'JetBrains Mono',monospace; background:var(--surface2); padding:2px 7px; border-radius:5px; font-size:.8rem; color:var(--orange); }
+
+/* COMPARE */
+.compare { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:20px 0; }
+@media (max-width:600px) { .compare { grid-template-columns:1fr; } }
+.cmp-card { border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); }
+.cmp-card-hd { padding:14px 20px; font-weight:800; font-size:1.05rem; display:flex; align-items:center; gap:8px; }
+.cmp-card-bd { padding:16px 20px; background:var(--surface); font-family:'JetBrains Mono',monospace; font-size:.78rem; line-height:1.7; white-space:pre; min-height:130px; }
+.cmp-card-ft { padding:10px 16px; background:var(--surface2); display:flex; flex-wrap:wrap; gap:6px; }
+.cmp-tag { font-size:.68rem; padding:3px 10px; border-radius:20px; font-weight:600; }
+.csv-hd { background:linear-gradient(135deg,#064e3b,#065f46); }
+.csv-tag { background:#065f46; color:#6ee7b7; }
+.json-hd { background:linear-gradient(135deg,#3b0764,#4c1d95); }
+.json-tag { background:#4c1d95; color:#c4b5fd; }
+
+/* TABLE */
+table.tbl { width:100%; border-collapse:separate; border-spacing:0; margin:18px 0; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+.tbl th, .tbl td { padding:12px 16px; text-align:left; font-size:.85rem; }
+.tbl thead th { background:var(--surface2); font-weight:700; color:var(--text-muted); text-transform:uppercase; font-size:.72rem; letter-spacing:.8px; }
+.tbl tbody tr { background:var(--surface); }
+.tbl tbody tr:hover { background:var(--surface2); }
+.tbl tbody td { border-top:1px solid var(--border); }
+.tbl .tc { text-align:center; }
+
+/* PROMPT */
+.prompt-card { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--purple); border-radius:0 var(--radius) var(--radius) 0; padding:22px 24px; margin:16px 0; }
+.prompt-card h3 { font-size:1rem; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.prompt-card .time { font-size:.72rem; font-weight:600; padding:3px 10px; border-radius:20px; background:var(--surface3); color:var(--text-dim); }
+.prompt-card pre { font-family:'JetBrains Mono',monospace; font-size:.82rem; line-height:1.6; color:var(--text-dim); background:var(--surface2); padding:16px; border-radius:var(--radius-sm); white-space:pre-wrap; word-break:break-word; margin-top:10px; }
+
+/* TOPICS */
+.topic-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin:16px 0; }
+.topic { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; transition:border-color .15s,transform .15s; }
+.topic:hover { border-color:var(--purple); transform:translateY(-2px); }
+.topic-level { font-size:.68rem; font-weight:700; padding:3px 10px; border-radius:20px; display:inline-block; margin-bottom:8px; }
+.topic-level.lv-easy { background:#064e3b; color:#6ee7b7; }
+.topic-level.lv-mid { background:#713f12; color:#fde047; }
+.topic-level.lv-hard { background:#7f1d1d; color:#fca5a5; }
+.topic-level.lv-life { background:#312e81; color:#a5b4fc; }
+.topic-title { font-weight:700; font-size:.9rem; margin-bottom:6px; }
+.topic-desc { font-size:.78rem; color:var(--text-dim); line-height:1.5; }
+.star { color:var(--orange); margin-left:4px; }
+
+/* CALLOUT */
+.callout { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--cyan); border-radius:0 var(--radius) var(--radius) 0; padding:16px 20px; margin:20px 0; font-size:.9rem; color:var(--text-dim); line-height:1.6; }
+.callout-icon { font-size:1.2rem; flex-shrink:0; margin-top:2px; }
+
+/* CHECKLIST */
+.checklist { list-style:none; margin:16px 0; }
+.checklist li { display:flex; align-items:center; gap:12px; padding:12px 18px; background:var(--surface); border:1px solid var(--border); border-radius:10px; margin-bottom:8px; font-size:.9rem; transition:border-color .15s; cursor:pointer; user-select:none; }
+.checklist li:hover { border-color:var(--green); }
+.check-box { width:22px; height:22px; border:2px solid var(--border-light); border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.checklist li.checked .check-box { background:var(--green); border-color:var(--green); }
+.checklist li.checked .check-box::after { content:'✓'; color:#fff; font-size:.8rem; font-weight:800; }
+.checklist li.checked { color:var(--text-dim); text-decoration:line-through; }
+
+/* NAV */
+.nav-link { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:40px; padding:18px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); color:var(--blue); text-decoration:none; font-weight:700; font-size:.95rem; transition:border-color .2s,transform .2s; }
+.nav-link:hover { border-color:var(--blue); transform:translateY(-2px); }
+
+/* DESC */
+.desc { color:var(--text-dim); font-size:.92rem; line-height:1.7; margin-bottom:20px; }
+.desc strong { color:var(--text); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ HERO ═══ -->
+  <header class="hero">
+    <div class="hero-badge">📌 VIBE 101 · Lecture 07</div>
+    <h1>JSON 마스터</h1>
+    <p>데이터의 표준 언어 — key-value, 배열, 중첩 객체를 이해하고 활용하는 방법을 배웁니다.</p>
+  </header>
+
+  <!-- ═══ 이론 ═══ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:linear-gradient(135deg,var(--blue),var(--purple))">📖</div>
+      <h2>이론</h2>
+      <span class="time-tag">⏱ 20분</span>
+    </div>
+
+    <h3 style="font-size:1.15rem; margin-bottom:14px;">JSON이란 무엇인가요?</h3>
+    <p class="desc">JSON은 <strong>J</strong>ava<strong>S</strong>cript <strong>O</strong>bject <strong>N</strong>otation의 약자로, 데이터를 주고받을 때 사용하는 <strong style="color:var(--cyan)">세계 표준</strong> 형식입니다.</p>
+    <p class="desc">사람이 읽기 쉬운 텍스트 형태이면서, 동시에 컴퓨터가 자동으로 파싱할 수 있어서 웹 API, 설정 파일, 데이터 교환 등 거의 모든 곳에서 사용됩니다.</p>
+
+    <!-- CODE + TREE 분할 뷰 -->
+    <div class="split">
+      <div class="code-block" style="margin:0">
+        <div class="code-bar">
+          <div class="dot" style="background:var(--red)"></div>
+          <div class="dot" style="background:var(--orange)"></div>
+          <div class="dot" style="background:var(--green)"></div>
+          &nbsp; profile.json
+        </div>
+<pre class="code"><span class="br">{</span>
+  <span class="k">"이름"</span><span class="p">:</span> <span class="s">"홍길동"</span><span class="p">,</span>        <span class="cmt">← 문자열</span>
+  <span class="k">"나이"</span><span class="p">:</span> <span class="n">25</span><span class="p">,</span>              <span class="cmt">← 숫자</span>
+  <span class="k">"취미"</span><span class="p">:</span> <span class="br">[</span><span class="s">"독서"</span><span class="p">,</span> <span class="s">"코딩"</span><span class="p">,</span> <span class="s">"등산"</span><span class="br">]</span><span class="p">,</span> <span class="cmt">← 배열</span>
+  <span class="k">"주소"</span><span class="p">:</span> <span class="br">{</span>               <span class="cmt">← 중첩 객체</span>
+    <span class="k">"도시"</span><span class="p">:</span> <span class="s">"서울"</span><span class="p">,</span>
+    <span class="k">"구"</span><span class="p">:</span> <span class="s">"강남구"</span>
+  <span class="br">}</span><span class="p">,</span>
+  <span class="k">"결혼여부"</span><span class="p">:</span> <span class="b">false</span>        <span class="cmt">← 불리언</span>
+<span class="br">}</span></pre>
+      </div>
+
+      <div class="card" style="margin:0">
+        <div class="card-head">🌳 트리 구조</div>
+        <div class="card-body">
+          <div class="tree-item"><div class="tree-dot" style="background:var(--blue)">Aa</div><div><div class="tree-label">이름</div><div class="tree-value">"홍길동"</div></div></div>
+          <div class="tree-item"><div class="tree-dot" style="background:var(--orange)">12</div><div><div class="tree-label">나이</div><div class="tree-value">25</div></div></div>
+          <div class="tree-item"><div class="tree-dot" style="background:var(--purple)">[ ]</div><div><div class="tree-label">취미</div><div class="tree-sub"><div class="tree-sub-item">0: "독서"</div><div class="tree-sub-item">1: "코딩"</div><div class="tree-sub-item">2: "등산"</div></div></div></div>
+          <div class="tree-item"><div class="tree-dot" style="background:var(--pink)">{ }</div><div><div class="tree-label">주소</div><div class="tree-sub"><div class="tree-sub-item">도시 → "서울"</div><div class="tree-sub-item">구 → "강남구"</div></div></div></div>
+          <div class="tree-item"><div class="tree-dot" style="background:var(--bool)">✓✗</div><div><div class="tree-label">결혼여부</div><div class="tree-value">false</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6가지 값 타입 -->
+    <h3 style="font-size:1rem; margin:28px 0 8px;">JSON이 담을 수 있는 6가지 값 타입</h3>
+    <p class="desc" style="margin-bottom:12px;">JSON의 value 자리에는 아래 6가지 타입만 올 수 있습니다. 이 규칙을 지키지 않으면 파싱 에러가 발생합니다.</p>
+    <div class="chips">
+      <div class="chip"><div class="chip-icon">📝</div><div class="chip-name" style="color:var(--str)">문자열</div><div class="chip-eg">"안녕하세요"</div></div>
+      <div class="chip"><div class="chip-icon">🔢</div><div class="chip-name" style="color:var(--num)">숫자</div><div class="chip-eg">42, 3.14</div></div>
+      <div class="chip"><div class="chip-icon">✅</div><div class="chip-name" style="color:var(--bool)">불리언</div><div class="chip-eg">true / false</div></div>
+      <div class="chip"><div class="chip-icon">📦</div><div class="chip-name" style="color:var(--bracket)">배열</div><div class="chip-eg">["a","b","c"]</div></div>
+      <div class="chip"><div class="chip-icon">🗂️</div><div class="chip-name" style="color:var(--pink)">객체</div><div class="chip-eg">{"k":"v"}</div></div>
+      <div class="chip"><div class="chip-icon">⬜</div><div class="chip-name" style="color:var(--text-muted)">null</div><div class="chip-eg">null (값 없음)</div></div>
+    </div>
+
+    <!-- 규칙 5가지 -->
+    <h3 style="font-size:1rem; margin:28px 0 8px;">JSON을 작성할 때 반드시 지켜야 하는 5가지 규칙</h3>
+    <p class="desc" style="margin-bottom:12px;">JSON은 문법이 엄격합니다. 아래 규칙 하나라도 어기면 전체 파일이 에러가 되므로, 처음부터 정확하게 익혀 두는 것이 중요합니다.</p>
+    <div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-text"><strong>키(key)</strong>는 반드시 <code>"큰따옴표"</code>로 감싸야 합니다.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-text"><strong>값(value)</strong>에는 문자열, 숫자, 배열, 객체, true/false, null만 올 수 있습니다.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-text"><strong>배열</strong> <code>[ ]</code>은 여러 값을 순서대로 담는 목록입니다.</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-text"><strong>중첩</strong>이 가능합니다. 객체 안에 객체, 배열 안에 객체를 넣을 수 있습니다.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-text">마지막 항목 뒤에 <code>쉼표를 붙이면 안 됩니다.</code> CSV와 다릅니다!</div></div>
+    </div>
+
+    <!-- CSV vs JSON -->
+    <h3 style="font-size:1.1rem; margin:36px 0 12px;">CSV vs JSON — 같은 데이터, 다른 표현 방식</h3>
+    <p class="desc">같은 학생 데이터를 CSV와 JSON으로 각각 표현하면 아래와 같습니다. CSV는 엑셀처럼 납작한 2차원 표 구조이고, JSON은 나무처럼 가지를 뻗는 트리 구조입니다.</p>
+    <div class="compare">
+      <div class="cmp-card">
+        <div class="cmp-card-hd csv-hd">📊 CSV</div>
+<div class="cmp-card-bd">이름,나이,도시
+홍길동,25,서울
+김영희,30,부산
+이철수,22,대전</div>
+        <div class="cmp-card-ft">
+          <span class="cmp-tag csv-tag">📋 2차원 표</span>
+          <span class="cmp-tag csv-tag">🔓 중첩 불가</span>
+          <span class="cmp-tag csv-tag">📂 엑셀 호환</span>
+        </div>
+      </div>
+      <div class="cmp-card">
+        <div class="cmp-card-hd json-hd">🔮 JSON</div>
+<div class="cmp-card-bd"><span class="br">[</span>
+  <span class="br">{</span><span class="k">"이름"</span>:<span class="s">"홍길동"</span>, <span class="k">"나이"</span>:<span class="n">25</span>,
+   <span class="k">"도시"</span>:<span class="s">"서울"</span><span class="br">}</span>,
+  <span class="br">{</span><span class="k">"이름"</span>:<span class="s">"김영희"</span>, <span class="k">"나이"</span>:<span class="n">30</span>,
+   <span class="k">"도시"</span>:<span class="s">"부산"</span><span class="br">}</span>
+<span class="br">]</span></div>
+        <div class="cmp-card-ft">
+          <span class="cmp-tag json-tag">🌳 트리 구조</span>
+          <span class="cmp-tag json-tag">🔄 중첩 가능</span>
+          <span class="cmp-tag json-tag">🌐 API 표준</span>
+        </div>
+      </div>
+    </div>
+    <table class="tbl">
+      <thead><tr><th></th><th>CSV</th><th>JSON</th></tr></thead>
+      <tbody>
+        <tr><td><strong>형태</strong></td><td>표 (2차원)</td><td>트리 (다차원)</td></tr>
+        <tr><td><strong>적합한 데이터</strong></td><td>단순한 목록</td><td>복잡한 구조 데이터</td></tr>
+        <tr><td><strong>가독성</strong></td><td>엑셀로 열기 좋음</td><td>사람 &amp; 기계 모두 OK</td></tr>
+        <tr><td><strong>중첩</strong></td><td class="tc">❌</td><td class="tc">✅</td></tr>
+        <tr><td><strong>주요 용도</strong></td><td>데이터 내보내기</td><td>API 통신, 설정 파일</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══ 가이드 실습 ═══ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:linear-gradient(135deg,var(--orange),var(--pink))">🔨</div>
+      <h2>가이드 실습</h2>
+      <span class="time-tag">⏱ 25분</span>
+    </div>
+
+    <div class="prompt-card">
+      <h3>실습 1: JSON 설계 + 생성 <span class="time">8분</span></h3>
+      <p style="color:var(--text-dim); font-size:.88rem; margin-bottom:8px;">나만의 프로필 데이터를 JSON 형식으로 설계합니다. 문자열, 배열, 중첩 객체를 모두 활용합니다.</p>
+<pre>나의 프로필을 JSON 파일로 만들어줘:
+- 이름, 나이, 직업
+- 취미 (배열로 3개 이상)
+- 좋아하는 음식 (배열)
+- SNS 계정 (객체: 플랫폼명-아이디 쌍)
+- 최근 읽은 책 3권 (배열 안의 객체: 제목, 저자, 평점)</pre>
+    </div>
+
+    <div class="prompt-card">
+      <h3>실습 2: JSON 읽기 + 검색 <span class="time">10분</span></h3>
+      <p style="color:var(--text-dim); font-size:.88rem; margin-bottom:8px;">실습 1에서 만든 JSON 파일을 코드로 읽고, 원하는 데이터를 검색하고 수정하는 방법을 실습합니다.</p>
+<pre>위 프로필 JSON을 읽어서:
+1. 전체 정보를 보기 좋게 출력
+2. 취미 개수 세기
+3. 평점 4.5 이상인 책만 필터링
+4. 새로운 SNS 계정을 추가하고 저장
+JS와 Python 둘 다 만들어줘.</pre>
+    </div>
+
+    <div class="prompt-card">
+      <h3>실습 3: CSV ↔ JSON 변환 <span class="time">7분</span></h3>
+      <p style="color:var(--text-dim); font-size:.88rem; margin-bottom:8px;">6강에서 만든 CSV 데이터를 JSON으로, 다시 JSON을 CSV로 변환하며 두 형식 간의 관계를 체감합니다.</p>
+<pre>6강에서 만든 students.csv를 JSON으로 변환하고,
+다시 JSON에서 CSV로 변환하는 양방향 변환기를 만들어줘.</pre>
+    </div>
+  </section>
+
+  <!-- ═══ 자율 실습 (TOPIC_POOL 통합) ═══ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:linear-gradient(135deg,var(--green),var(--cyan))">🎯</div>
+      <h2>자율 실습</h2>
+      <span class="time-tag">⏱ 25분</span>
+    </div>
+    <p class="desc">JSON의 key-value, 배열, 중첩 구조를 다양한 시나리오에서 활용해 보세요. 아래 주제 중 하나를 골라서 스스로 AI에게 프롬프트를 작성하고 실습합니다.</p>
+
+    <!-- 🟢 입문 -->
+    <h3 style="font-size:1rem; margin-bottom:12px;">🟢 입문</h3>
+    <div class="topic-grid">
+      <div class="topic"><span class="topic-level lv-easy">🟢 입문</span><div class="topic-title">레시피 데이터베이스<span class="star">⭐ 추천</span></div><div class="topic-desc">좋아하는 요리 5개의 레시피를 JSON으로 설계합니다. 요리명, 재료(배열), 난이도, 조리시간, 단계(배열)를 포함합니다.</div></div>
+      <div class="topic"><span class="topic-level lv-easy">🟢 입문</span><div class="topic-title">플레이리스트 관리</div><div class="topic-desc">음악 플레이리스트를 JSON으로 관리합니다. 곡명, 가수, 장르, 재생시간을 입력하고 장르별 필터링을 구현합니다.</div></div>
+      <div class="topic"><span class="topic-level lv-easy">🟢 입문</span><div class="topic-title">게임 세이브 데이터</div><div class="topic-desc">RPG 캐릭터의 세이브 데이터를 JSON으로 만듭니다. 이름, 레벨, HP/MP, 인벤토리(배열), 장비(객체)를 포함합니다.</div></div>
+      <div class="topic"><span class="topic-level lv-easy">🟢 입문</span><div class="topic-title">환경설정 관리자</div><div class="topic-desc">앱 설정을 JSON으로 관리합니다. 테마, 언어, 알림 설정, 글꼴 크기를 저장하고 설정 변경 및 저장 기능을 만듭니다.</div></div>
+      <div class="topic"><span class="topic-level lv-easy">🟢 입문</span><div class="topic-title">연락처 관리 (JSON 버전)</div><div class="topic-desc"><a href="../L06_CSV_데이터_다루기/index.html" style="color:var(--cyan); text-decoration:none;">6강</a>에서 만든 CSV 연락처를 JSON으로 변환하고, 검색, 추가, 삭제 기능을 구현합니다.</div></div>
+    </div>
+
+    <!-- 🟡 도전 -->
+    <h3 style="font-size:1rem; margin:28px 0 12px;">🟡 도전</h3>
+    <div class="topic-grid">
+      <div class="topic"><span class="topic-level lv-mid">🟡 도전</span><div class="topic-title">퀴즈 데이터 설계<span class="star">⭐ 추천</span></div><div class="topic-desc">4지선다 퀴즈 10문제를 JSON으로 설계합니다. 문제, 보기(배열), 정답, 난이도, 카테고리를 체계적으로 구성합니다.</div></div>
+      <div class="topic"><span class="topic-level lv-mid">🟡 도전</span><div class="topic-title">가계도 트리</div><div class="topic-desc">가족 관계를 JSON 트리 구조로 표현합니다. 부모-자식 관계를 중첩 객체로 구성하여 계층 구조를 나타냅니다.</div></div>
+      <div class="topic"><span class="topic-level lv-mid">🟡 도전</span><div class="topic-title">다국어 번역 파일</div><div class="topic-desc">앱에서 사용하는 UI 문구를 한국어, 영어, 일본어로 관리하는 다국어 JSON 파일을 만들고 언어 전환 기능을 구현합니다.</div></div>
+      <div class="topic"><span class="topic-level lv-mid">🟡 도전</span><div class="topic-title">일정표 데이터</div><div class="topic-desc">주간 일정을 JSON으로 관리합니다. 요일별 시간대, 제목, 장소, 메모를 구조화하여 일정 검색 기능을 만듭니다.</div></div>
+      <div class="topic"><span class="topic-level lv-mid">🟡 도전</span><div class="topic-title">API 응답 파싱</div><div class="topic-desc">실제 날씨 API의 응답 예시 JSON을 파싱하여 필요한 정보(온도, 습도 등)만 추출하는 프로그램을 만듭니다.</div></div>
+    </div>
+
+    <!-- 🔴 심화 -->
+    <h3 style="font-size:1rem; margin:28px 0 12px;">🔴 심화</h3>
+    <div class="topic-grid">
+      <div class="topic"><span class="topic-level lv-hard">🔴 심화</span><div class="topic-title">JSON 스키마 검증</div><div class="topic-desc">JSON 데이터가 정해진 형식(스키마)에 맞는지 자동으로 검증하는 프로그램을 작성합니다.</div></div>
+      <div class="topic"><span class="topic-level lv-hard">🔴 심화</span><div class="topic-title">JSON 병합 도구</div><div class="topic-desc">여러 JSON 파일을 하나로 합칩니다. 중복 키가 있으면 최신 값을 유지하는 로직을 구현합니다.</div></div>
+      <div class="topic"><span class="topic-level lv-hard">🔴 심화</span><div class="topic-title">JSON → 마크다운 변환기</div><div class="topic-desc">JSON 데이터를 보기 좋은 마크다운 문서로 자동 변환하는 프로그램을 만듭니다.</div></div>
+    </div>
+
+    <!-- 💡 실생활 응용 -->
+    <h3 style="font-size:1rem; margin:28px 0 12px;">💡 실생활 응용</h3>
+    <div class="topic-grid">
+      <div class="topic"><span class="topic-level lv-life">💡 응용</span><div class="topic-title">독서 기록</div><div class="topic-desc">읽은 책, 읽는 중인 책, 읽고 싶은 책을 상태별로 관리하는 JSON 시스템을 만듭니다.</div></div>
+      <div class="topic"><span class="topic-level lv-life">💡 응용</span><div class="topic-title">여행 계획</div><div class="topic-desc">여행지별 볼거리, 맛집, 숙소를 JSON으로 체계적으로 정리하고 검색하는 프로그램을 만듭니다.</div></div>
+    </div>
+
+    <!-- 🤔 생각해볼 점 -->
+    <div class="callout" style="margin-top:28px; border-left-color:var(--purple);">
+      <span class="callout-icon">🤔</span>
+      <div>
+        <strong style="color:var(--text)">생각해볼 점</strong>
+        <ul style="margin-top:8px; padding-left:20px; color:var(--text-dim); font-size:.88rem; line-height:1.8;">
+          <li>JSON 파일이 너무 커지면 어떻게 관리할까요? → 데이터베이스의 필요성을 느껴보세요. (<a href="../L23_데이터베이스_입문/index.html" style="color:var(--cyan); text-decoration:none;">23강 예고</a>)</li>
+          <li>JSON에서 주석(comment)을 쓸 수 없는 이유와 그 대안은 무엇일까요?</li>
+          <li>같은 데이터를 CSV와 JSON으로 저장할 때 파일 크기 차이는 얼마나 될까요?</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 체크리스트 ═══ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:linear-gradient(135deg,var(--green),var(--blue))">✅</div>
+      <h2>이번 강의 체크리스트</h2>
+    </div>
+    <ul class="checklist">
+      <li onclick="this.classList.toggle('checked')"><div class="check-box"></div>JSON의 구조(key-value, 배열, 중첩 객체)를 이해했습니다.</li>
+      <li onclick="this.classList.toggle('checked')"><div class="check-box"></div>JSON 파일을 읽고 특정 데이터를 검색할 수 있습니다.</li>
+      <li onclick="this.classList.toggle('checked')"><div class="check-box"></div>JSON에 데이터를 추가하고, 수정하고, 삭제할 수 있습니다.</li>
+      <li onclick="this.classList.toggle('checked')"><div class="check-box"></div>CSV와 JSON의 차이를 명확하게 설명할 수 있습니다.</li>
+    </ul>
+  </section>
+
+  <!-- ═══ NAV ═══ -->
+  <a class="nav-link" href="../L08_파일_자동_정리/index.html">다음 강의 → 8강: 파일 자동 정리 🗂️</a>
+
+</div>
+</body>
+</html>
